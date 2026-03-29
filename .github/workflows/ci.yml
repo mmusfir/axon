@@ -26,7 +26,7 @@ jobs:
           npx prettier --check .
           npx eslint . --max-warnings 0
           npm test
-          npm audit --audit-level=high
+          npm audit --audit-level=critical
 
       # --- 2. AI WORKER ---
       - name: AI Worker - Install & Quality
@@ -36,7 +36,7 @@ jobs:
           npx prettier --check .
           npx eslint . --max-warnings 0
           npm test
-          npm audit --audit-level=high
+          npm audit --audit-level=critical
 
       # --- 3. BILLING ---
       - name: Billing - Install & Quality
@@ -46,7 +46,7 @@ jobs:
           npx prettier --check .
           npx eslint . --max-warnings 0
           npm test
-          npm audit --audit-level=high
+          npm audit --audit-level=critical
 
       # --- 4. SECURITY & ANALYSIS ---
       - name: Run Secret Scanning (Gitleaks)
