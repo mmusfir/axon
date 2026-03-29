@@ -22,7 +22,7 @@ jobs:
           node-version: '22'
           
       # --- 1. API GATEWAY ---
-      - name: Gateway - Install & Quality
+      - name: API Gateway - Install & Quality
         working-directory: ./backend/api-gateway
         run: |
           npm ci
