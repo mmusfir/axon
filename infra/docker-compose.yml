@@ -1,0 +1,57 @@
+services:
+  api-gateway:
+    build:
+      context: ./backend/api-gateway
+      target: development
+    command: npm run start:dev
+    environment:
+      - PORT=${API_GATEWAY_PORT}
+    ports:
+      - "${API_GATEWAY_PORT}:${API_GATEWAY_PORT}"
+
+  ai-worker:
+    build:
+      context: ./backend/ai-worker
+      target: development
+    command: npm run start:dev
+    environment:
+      - PORT=${AI_WORKER_PORT}
+    ports:
+      - "${AI_WORKER_PORT}:${AI_WORKER_PORT}"
+
+  billing:
+    build:
+      context: ./backend/billing
+      target: development
+    command: npm run start:dev
+    environment:
+      - PORT=${BILLING_PORT}
+    ports:
+      - "${BILLING_PORT}:${BILLING_PORT}"
+  redis:
+    image: redis:latest
+    container_name: axon-redis
+    ports:
+      - "${REDIS_PORT}:${REDIS_PORT}"
+    volumes:
+      - redis-data:/data
+    environment:
+      - REDIS_ARGS=--requirepass ${REDIS_PASSWORD} --appendonly yes
+    restart: unless-stopped
+  rabbitmq:
+    image: rabbitmq:4-management-alpine
+    container_name: axon-rabbitmq
+    ports:
+      - "${RMQ_PORT}:${RMQ_PORT}"
+      - "${RMQ_UI_PORT}:${RMQ_UI_PORT}"
+    environment:
+      - RMQ_DEFAULT_USER=${RMQ_USER}
+      - RMQ_DEFAULT_PASS=${RMQ_PASS}
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq
+    restart: unless-stopped
+volumes:
+  redis-data:
+    driver: local
+  rabbitmq-data:
+    driver: local
