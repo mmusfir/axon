@@ -1,0 +1,61 @@
+name: CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+jobs:
+  quality-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          
+      # --- 1. API GATEWAY ---
+      - name: Gateway - Install & Quality
+        working-directory: ./backend/api-gateway
+        run: |
+          npm ci
+          npx prettier --check .
+          npx eslint . --max-warnings 0
+          npm test
+          npm audit --audit-level=high
+
+      # --- 2. AI WORKER ---
+      - name: AI Worker - Install & Quality
+        working-directory: ./backend/ai-worker
+        run: |
+          npm ci
+          npx prettier --check .
+          npx eslint . --max-warnings 0
+          npm test
+          npm audit --audit-level=high
+
+      # --- 3. BILLING ---
+      - name: Billing - Install & Quality
+        working-directory: ./backend/billing
+        run: |
+          npm ci
+          npx prettier --check .
+          npx eslint . --max-warnings 0
+          npm test
+          npm audit --audit-level=high
+
+      # --- 4. SECURITY & ANALYSIS ---
+      - name: Run Secret Scanning (Gitleaks)
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarcloud-github-action@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
